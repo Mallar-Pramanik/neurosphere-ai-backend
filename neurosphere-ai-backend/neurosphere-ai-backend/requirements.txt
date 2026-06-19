@@ -1,5 +1,5 @@
 # FastAPI and Web Framework
-fastapi==0.104.1
+fastapi
 uvicorn[standard]==0.24.0
 pydantic
 pydantic-settings
@@ -48,6 +48,3 @@ slowapi==0.1.9
 
 # Production
 gunicorn==21.2.0
-
-
-ollama
