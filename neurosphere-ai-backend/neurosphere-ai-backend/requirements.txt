@@ -48,3 +48,6 @@ slowapi==0.1.9
 
 # Production
 gunicorn==21.2.0
+
+
+ollama
