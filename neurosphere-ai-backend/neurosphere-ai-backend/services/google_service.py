@@ -8,7 +8,7 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google.oauth2.service_account import Credentials as ServiceAccountCredentials
 from google_auth_oauthlib.flow import InstalledAppFlow
-from google.cloud import language_v1
+# from google.cloud import language_v1
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from datetime import datetime
