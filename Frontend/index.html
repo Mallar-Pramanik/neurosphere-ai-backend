@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroSphere AI - Premium AI Platform</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    
+    <!-- Three.js and GSAP (for 3D effects) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+</head>
+<body>
+    <!-- 3D Canvas Container -->
+    <div id="canvas-container"></div>
+    
+    <!-- Authentication Modal -->
+    <div id="authModal" class="modal hidden">
+        <div class="modal-content auth-container">
+            <button class="modal-close" onclick="closeAuthModal()">✕</button>
+            
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form active">
+                <h2>Welcome Back</h2>
+                <p>Sign in to your account</p>
+                
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" placeholder="your@email.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <span>Sign In</span>
+                        <div class="spinner hidden"></div>
+                    </button>
+                </form>
+                
+                <p class="auth-switch">
+                    Don't have an account? 
+                    <a href="#" onclick="toggleAuthForm()">Sign Up</a>
+                </p>
+            </div>
+            
+            <!-- Register Form -->
+            <div id="registerForm" class="auth-form">
+                <h2>Create Account</h2>
+                <p>Join NeuroSphere AI today</p>
+                
+                <form onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label for="regUsername">Username</label>
+                        <input type="text" id="regUsername" placeholder="your_username" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regEmail">Email Address</label>
+                        <input type="email" id="regEmail" placeholder="your@email.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regPassword">Password</label>
+                        <input type="password" id="regPassword" placeholder="••••••••" minlength="8" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regFullName">Full Name</label>
+                        <input type="text" id="regFullName" placeholder="Your Full Name">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <span>Create Account</span>
+                        <div class="spinner hidden"></div>
+                    </button>
+                </form>
+                
+                <p class="auth-switch">
+                    Already have an account? 
+                    <a href="#" onclick="toggleAuthForm()">Sign In</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Navigation -->
+    <header>
+        <nav class="navbar">
+            <div class="logo">NeuroSphere AI</div>
+            
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#dashboard" onclick="checkAuth()">Dashboard</a></li>
+            </ul>
+            
+            <div class="nav-actions">
+                <button class="nav-btn" id="authBtn" onclick="openAuthModal()">Get Started</button>
+                <button class="user-menu-btn hidden" id="userMenuBtn" onclick="toggleUserMenu()">
+                    <span id="userEmail">User</span>
+                    <div id="userMenu" class="user-menu hidden">
+                        <a href="#dashboard" onclick="checkAuth()">Dashboard</a>
+                        <a href="#tasks">My Tasks</a>
+                        <a href="#profile">Profile</a>
+                        <hr>
+                        <a href="#" onclick="handleLogout()" class="logout-btn">Logout</a>
+                    </div>
+                </button>
+            </div>
+        </nav>
+    </header>
+    
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <span class="badge">🚀 Next Generation AI Platform</span>
+            
+            <h1>
+                Build Smarter
+                <span>With Artificial Intelligence</span>
+            </h1>
+            
+            <p>Create, automate and scale your business with cutting-edge AI solutions powered by Odysseus AI and Google APIs.</p>
+            
+            <div class="hero-buttons">
+                <button class="primary-btn" onclick="openAuthModal()">Start Free</button>
+                <button class="secondary-btn" onclick="scrollTo('#features')">Watch Demo</button>
+            </div>
+        </div>
+        
+        <div class="hero-card">
+            <div class="glass-card">
+                <h3>AI Dashboard</h3>
+                <div class="stats">
+                    <div class="stat">
+                        <h2>99.9%</h2>
+                        <p>Accuracy</p>
+                    </div>
+                    <div class="stat">
+                        <h2 id="userCount">0</h2>
+                        <p>Active Users</p>
+                    </div>
+                    <div class="stat">
+                        <h2>24/7</h2>
+                        <p>Support</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <h2>Powerful Features</h2>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>🤖 AI Chat</h3>
+                <p>Multi-turn conversations with Odysseus AI model.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>✍️ Content Generation</h3>
+                <p>Generate blog posts, emails, and social media content.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>📊 Smart Analytics</h3>
+                <p>Gain deep business insights with AI analysis.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>📧 Gmail Integration</h3>
+                <p>Read and send emails directly from the platform.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>☁️ Cloud Storage</h3>
+                <p>Access and manage Google Drive files seamlessly.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>🔍 NLP Analysis</h3>
+                <p>Sentiment analysis, entity recognition, and more.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing">
+        <h2>Pricing Plans</h2>
+        
+        <div class="pricing-container">
+            <div class="price-card">
+                <h3>Starter</h3>
+                <h1>$29</h1>
+                <p>Perfect for beginners</p>
+                <button class="btn btn-outline" onclick="selectPlan('starter')">Select Plan</button>
+                <ul class="features-list">
+                    <li>✓ 100 AI Requests/month</li>
+                    <li>✓ Basic Chat</li>
+                    <li>✓ Email Support</li>
+                </ul>
+            </div>
+            
+            <div class="price-card popular">
+                <div class="popular-badge">MOST POPULAR</div>
+                <h3>Professional</h3>
+                <h1>$99</h1>
+                <p>For growing businesses</p>
+                <button class="btn btn-primary" onclick="selectPlan('professional')">Select Plan</button>
+                <ul class="features-list">
+                    <li>✓ 1000 AI Requests/month</li>
+                    <li>✓ Advanced Chat & Generation</li>
+                    <li>✓ Google APIs Integration</li>
+                    <li>✓ Priority Support</li>
+                </ul>
+            </div>
+            
+            <div class="price-card">
+                <h3>Enterprise</h3>
+                <h1>$299</h1>
+                <p>For large companies</p>
+                <button class="btn btn-outline" onclick="selectPlan('enterprise')">Select Plan</button>
+                <ul class="features-list">
+                    <li>✓ Unlimited Requests</li>
+                    <li>✓ All Features</li>
+                    <li>✓ Custom Integration</li>
+                    <li>✓ Dedicated Account Manager</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="dashboard hidden">
+        <div class="dashboard-container">
+            <!-- Sidebar -->
+            <aside class="dashboard-sidebar">
+                <h3>Menu</h3>
+                <ul>
+                    <li><a href="#" onclick="showDashboardTab('chat')" class="active">💬 Chat</a></li>
+                    <li><a href="#" onclick="showDashboardTab('generate')">✍️ Generate</a></li>
+                    <li><a href="#" onclick="showDashboardTab('analyze')">📊 Analyze</a></li>
+                    <li><a href="#" onclick="showDashboardTab('files')">📁 Files</a></li>
+                    <li><a href="#" onclick="showDashboardTab('tasks')">📋 Tasks</a></li>
+                    <li><a href="#" onclick="showDashboardTab('emails')">📧 Emails</a></li>
+                    <li><a href="#" onclick="showDashboardTab('drive')">☁️ Drive</a></li>
+                </ul>
+            </aside>
+            
+            <!-- Main Content -->
+            <main class="dashboard-content">
+                <!-- Chat Tab -->
+                <div id="chatTab" class="dashboard-tab active">
+                    <h2>AI Chat</h2>
+                    <div class="chat-container">
+                        <div id="chatMessages" class="chat-messages"></div>
+                        <div class="chat-input-container">
+                            <textarea id="chatInput" placeholder="Type your message..." rows="3"></textarea>
+                            <button class="btn btn-primary" onclick="sendChatMessage()">Send Message</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Content Generation Tab -->
+                <div id="generateTab" class="dashboard-tab">
+                    <h2>Content Generation</h2>
+                    <form onsubmit="generateContent(event)" class="form-container">
+                        <div class="form-group">
+                            <label>Content Type</label>
+                            <select id="contentType" required>
+                                <option value="blog_post">Blog Post</option>
+                                <option value="social_media">Social Media</option>
+                                <option value="email">Email</option>
+                                <option value="technical">Technical Writing</option>
+                                <option value="creative">Creative Content</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Tone</label>
+                            <select id="contentTone" required>
+                                <option value="professional">Professional</option>
+                                <option value="casual">Casual</option>
+                                <option value="formal">Formal</option>
+                                <option value="friendly">Friendly</option>
+                                <option value="creative">Creative</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Prompt</label>
+                            <textarea id="contentPrompt" placeholder="Describe what you want to generate..." rows="4" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <span>Generate Content</span>
+                            <div class="spinner hidden"></div>
+                        </button>
+                    </form>
+                    
+                    <div id="generatedContent" class="result-container hidden">
+                        <h3>Generated Content</h3>
+                        <div id="generatedText" class="content-display"></div>
+                        <button class="btn btn-secondary" onclick="copyToClipboard()">Copy to Clipboard</button>
+                    </div>
+                </div>
+                
+                <!-- Analysis Tab -->
+                <div id="analyzeTab" class="dashboard-tab">
+                    <h2>Data Analysis</h2>
+                    <form onsubmit="analyzeData(event)" class="form-container">
+                        <div class="form-group">
+                            <label>Text to Analyze</label>
+                            <textarea id="analyzeText" placeholder="Enter text to analyze..." rows="5" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <span>Analyze</span>
+                            <div class="spinner hidden"></div>
+                        </button>
+                    </form>
+                    
+                    <div id="analysisResult" class="result-container hidden">
+                        <h3>Analysis Results</h3>
+                        <div id="analysisText" class="content-display"></div>
+                    </div>
+                </div>
+                
+                <!-- File Processing Tab -->
+                <div id="filesTab" class="dashboard-tab">
+                    <h2>File Processing</h2>
+                    <div class="upload-container">
+                        <input type="file" id="fileInput" accept=".txt,.pdf,.json,.csv,.docx,.md" onchange="handleFileSelect()">
+                        <label for="fileInput" class="upload-label">
+                            📁 Click to upload or drag and drop
+                        </label>
+                        
+                        <div class="file-options">
+                            <select id="processType" required>
+                                <option value="analyze">Analyze</option>
+                                <option value="extract">Extract</option>
+                                <option value="summarize">Summarize</option>
+                            </select>
+                            <button type="button" class="btn btn-primary" onclick="processFile()">
+                                <span>Process File</span>
+                                <div class="spinner hidden"></div>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="processedFiles" class="files-list"></div>
+                </div>
+                
+                <!-- Tasks Tab -->
+                <div id="tasksTab" class="dashboard-tab">
+                    <h2>My Tasks</h2>
+                    <div id="tasksList" class="tasks-list"></div>
+                </div>
+                
+                <!-- Emails Tab -->
+                <div id="emailsTab" class="dashboard-tab">
+                    <h2>Gmail Integration</h2>
+                    <button class="btn btn-primary" onclick="fetchEmails()">Fetch Emails</button>
+                    <div id="emailsList" class="emails-list"></div>
+                </div>
+                
+                <!-- Drive Tab -->
+                <div id="driveTab" class="dashboard-tab">
+                    <h2>Google Drive</h2>
+                    <button class="btn btn-primary" onclick="fetchDriveFiles()">Load Drive Files</button>
+                    <div id="driveFilesList" class="files-list"></div>
+                </div>
+            </main>
+        </div>
+    </section>
+    
+    <!-- Notification Toast -->
+    <div id="notification" class="notification hidden">
+        <span id="notificationMessage"></span>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/three-setup.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
