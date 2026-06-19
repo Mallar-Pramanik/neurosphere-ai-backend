@@ -39,7 +39,7 @@ aiofiles==23.2.1
 httpx==0.25.1
 
 # Logging & Monitoring
-python-logging-loki==0.3.2
+python-logging-loki==0.3.1
 
 # Rate Limiting
 slowapi==0.1.9
