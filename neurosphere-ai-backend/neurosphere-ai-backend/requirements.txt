@@ -9,9 +9,7 @@ sqlalchemy==2.0.23
 alembic==1.13.1
 
 # Database Drivers
-sqlite3  # Built-in for SQLite
 psycopg2-binary==2.9.9  # For PostgreSQL
-mysqlclient==2.2.0  # For MySQL (alternative: pymysql)
 
 # Authentication & Security
 python-jose[cryptography]==3.3.0
