@@ -74,16 +74,11 @@ class GoogleAPIService:
                 logger.info("✅ Google Drive service initialized")
         except Exception as e:
             logger.warning(f"Drive service init error: {str(e)}")
+            
     
     def _init_nlp_service(self):
-        """Initialize Google Cloud NLP service"""
-        try:
-            # Create NLP client using service account credentials
-            if os.path.exists(settings.GOOGLE_CREDENTIALS_PATH):
-                self.nlp_client = language_v1.LanguageServiceClient()
-                logger.info("✅ Google Cloud NLP service initialized")
-        except Exception as e:
-            logger.warning(f"NLP service init error: {str(e)}")
+        self.nlp_client = None
+        logger.info("Google NLP disabled")
     
     def _get_credentials(self, scopes: List[str]):
         """Get Google API credentials"""
