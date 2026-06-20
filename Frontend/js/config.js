@@ -4,8 +4,8 @@
  */
 
 // Backend API URL
-const API_URL = "http://localhost:8000/api/v1";
-const API_BASE = "http://localhost:8000";
+const API_BASE = "https://neurosphere-ai-backend-2.onrender.com";
+const API_URL = `${API_BASE}/api/v1`;
 
 // API Endpoints
 const API_ENDPOINTS = {
