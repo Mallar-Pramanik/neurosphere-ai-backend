@@ -200,6 +200,8 @@ class AuthService:
                 raise ValueError("Invalid email or password")
             
             # Verify password
+            logger.info(f"User found: {user.email}")
+            logger.info(f"Hash starts with: {user.hashed_password[:30]}")
             if not AuthService.verify_password(password, user.hashed_password):
                 raise ValueError("Invalid email or password")
             
