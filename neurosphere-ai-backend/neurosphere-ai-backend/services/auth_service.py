@@ -1,5 +1,6 @@
 """
 Authentication Service - JWT tokens and user authentication
+Fixed version with password length validation for bcrypt's 72-byte limit
 """
 
 import logging
@@ -23,19 +24,66 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # Security scheme
 security = HTTPBearer()
 
+# Constants
+MAX_PASSWORD_BYTES = 72
+MIN_PASSWORD_LENGTH = 8
+
+
+class PasswordValidationError(Exception):
+    """Custom exception for password validation errors"""
+    pass
+
+
 class AuthService:
     """Service for authentication and authorization"""
-    
+
+    @staticmethod
+    def validate_password_length(password: str) -> None:
+        """
+        Validate password length is within bcrypt's 72-byte limit
+        
+        Args:
+            password: The password to validate
+            
+        Raises:
+            PasswordValidationError: If password exceeds 72 bytes
+        """
+        password_bytes = password.encode('utf-8')
+        
+        if len(password_bytes) > MAX_PASSWORD_BYTES:
+            raise PasswordValidationError(
+                f"Password cannot exceed {MAX_PASSWORD_BYTES} bytes. "
+                f"Your password is {len(password_bytes)} bytes. "
+                f"Please use a shorter password."
+            )
+        
+        if len(password) < MIN_PASSWORD_LENGTH:
+            raise PasswordValidationError(
+                f"Password must be at least {MIN_PASSWORD_LENGTH} characters long"
+            )
+
     @staticmethod
     def hash_password(password: str) -> str:
-        """Hash password"""
+        """
+        Hash password with length validation
+        
+        Args:
+            password: The password to hash
+            
+        Returns:
+            Hashed password
+            
+        Raises:
+            PasswordValidationError: If password is invalid
+        """
+        AuthService.validate_password_length(password)
         return pwd_context.hash(password)
-    
+
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
         """Verify password"""
         return pwd_context.verify(plain_password, hashed_password)
-    
+
     @staticmethod
     def create_access_token(
         data: dict,
@@ -43,24 +91,24 @@ class AuthService:
     ) -> str:
         """Create JWT access token"""
         to_encode = data.copy()
-        
+
         if expires_delta:
             expire = datetime.utcnow() + expires_delta
         else:
             expire = datetime.utcnow() + timedelta(
                 minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
             )
-        
+
         to_encode.update({"exp": expire})
-        
+
         encoded_jwt = jwt.encode(
             to_encode,
             settings.SECRET_KEY,
             algorithm=settings.ALGORITHM
         )
-        
+
         return encoded_jwt
-    
+
     @staticmethod
     def verify_token(token: str) -> dict:
         """Verify JWT token"""
@@ -81,25 +129,29 @@ class AuthService:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token"
             )
-    
+
     @staticmethod
     def register_user(
         db: Session,
         user_data
     ) -> User:
-        """Register new user"""
+        """Register new user with password validation"""
         try:
+            # Validate password before checking database
+            AuthService.validate_password_length(user_data.password)
+            
             # Check if user exists
             existing_user = db.query(User).filter(
-                (User.email == user_data.email) | (User.username == user_data.username)
+                (User.email == user_data.email) | (
+                    User.username == user_data.username)
             ).first()
-            
+
             if existing_user:
-                raise ValueError("User with this email or username already exists")
-            
-            # Create new user
+                raise ValueError(
+                    "User with this email or username already exists")
+
+            # Create new user with hashed password
             hashed_password = AuthService.hash_password(user_data.password)
-            
             user = User(
                 email=user_data.email,
                 username=user_data.username,
@@ -115,13 +167,16 @@ class AuthService:
             logger.info(f"✅ User registered: {user.email}")
             return user
             
+        except PasswordValidationError as e:
+            logger.warning(f"Password validation failed: {str(e)}")
+            raise ValueError(str(e))
         except ValueError as e:
             raise
         except Exception as e:
             logger.error(f"Registration error: {str(e)}")
             db.rollback()
             raise
-    
+
     @staticmethod
     def login_user(
         db: Session,
