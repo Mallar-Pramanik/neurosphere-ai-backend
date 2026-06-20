@@ -1,3 +1,10 @@
+@app.get("/")
+async def root():
+    return {
+        "status": "online",
+        "message": "NeuroSphere AI Backend is running"
+    }
+
 """
 NeuroSphere AI Backend - FastAPI Application
 Integrated with Odysseus AI Model and Google APIs
