@@ -6,6 +6,9 @@ class GoogleAPIService:
     def __init__(self):
         logger.info("Google API disabled")
 
+    def initialize(self):
+        logger.info("Google API initialization skipped")
+
     def analyze_sentiment(self, text):
         return {"error": "Google API disabled"}
 
