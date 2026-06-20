@@ -5,6 +5,7 @@ Fixed version with password length validation for bcrypt's 72-byte limit
 
 import logging
 from datetime import datetime, timedelta
+from pkgutil import get_data
 from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -41,22 +42,22 @@ class AuthService:
     def validate_password_length(password: str) -> None:
         """
         Validate password length is within bcrypt's 72-byte limit
-        
+
         Args:
             password: The password to validate
-            
+
         Raises:
             PasswordValidationError: If password exceeds 72 bytes
         """
         password_bytes = password.encode('utf-8')
-        
+
         if len(password_bytes) > MAX_PASSWORD_BYTES:
             raise PasswordValidationError(
                 f"Password cannot exceed {MAX_PASSWORD_BYTES} bytes. "
                 f"Your password is {len(password_bytes)} bytes. "
                 f"Please use a shorter password."
             )
-        
+
         if len(password) < MIN_PASSWORD_LENGTH:
             raise PasswordValidationError(
                 f"Password must be at least {MIN_PASSWORD_LENGTH} characters long"
@@ -66,13 +67,13 @@ class AuthService:
     def hash_password(password: str) -> str:
         """
         Hash password with length validation
-        
+
         Args:
             password: The password to hash
-            
+
         Returns:
             Hashed password
-            
+
         Raises:
             PasswordValidationError: If password is invalid
         """
@@ -139,7 +140,7 @@ class AuthService:
         try:
             # Validate password before checking database
             AuthService.validate_password_length(user_data.password)
-            
+
             # Check if user exists
             existing_user = db.query(User).filter(
                 (User.email == user_data.email) | (
@@ -151,7 +152,11 @@ class AuthService:
                     "User with this email or username already exists")
 
             # Create new user with hashed password
-            hashed_password = AuthService.hash_password(user_data.password)
+            logger.info(f"PASSWORD RECEIVED: {user_data.password}")
+            logger.info(f"PASSWORD TYPE: {type(user_data.password)}")
+            logger.info(f"PASSWORD LENGTH: {len(str(user_data.password))}")
+            hashed_password = AuthService.hash_password(str(user_data.password))
+
             user = User(
                 email=user_data.email,
                 username=user_data.username,
@@ -159,14 +164,14 @@ class AuthService:
                 full_name=user_data.full_name,
                 is_active=True
             )
-            
+
             db.add(user)
             db.commit()
             db.refresh(user)
-            
+
             logger.info(f"✅ User registered: {user.email}")
             return user
-            
+
         except PasswordValidationError as e:
             logger.warning(f"Password validation failed: {str(e)}")
             raise ValueError(str(e))
