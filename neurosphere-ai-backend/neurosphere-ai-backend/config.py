@@ -32,7 +32,7 @@ class Settings(BaseSettings):
 
 # CORS Settings
 ALLOWED_ORIGINS: List[str] = [
-    "*"
+    "https://neurosphere-frontend.onrender.com"
 ]
 
 # JWT Settings
