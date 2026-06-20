@@ -1,9 +1,3 @@
-@app.get("/")
-async def root():
-    return {
-        "status": "online",
-        "message": "NeuroSphere AI Backend is running"
-    }
 
 """
 NeuroSphere AI Backend - FastAPI Application
@@ -80,6 +74,13 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+@app.get("/")
+async def root():
+    return {
+        "status": "online",
+        "message": "NeuroSphere AI Backend is running"
+    }
 
 # Add CORS middleware
 app.add_middleware(
